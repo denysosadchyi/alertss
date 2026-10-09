@@ -2,17 +2,12 @@
 
 Маленький віджет, який живе прямо на панелі задач (там, де зазвичай погода) і показує статус повітряної тривоги для вибраної області. Клік відкриває панель з картою України.
 
-**Немає тривоги**
-
-![Немає тривоги](https://raw.githubusercontent.com/denysosadchyi/alertss/main/docs/clear.png)
-
-**Жовта тривога — дрони (частина області)**
-
-![Жовта тривога](https://raw.githubusercontent.com/denysosadchyi/alertss/main/docs/yellow.png)
-
-**Червона тривога — ракети**
-
-![Червона тривога](https://raw.githubusercontent.com/denysosadchyi/alertss/main/docs/red.png)
+<p align="center">
+  <img src="https://raw.githubusercontent.com/denysosadchyi/alertss/main/docs/clear.png" alt="Немає тривоги" width="240">
+  <img src="https://raw.githubusercontent.com/denysosadchyi/alertss/main/docs/yellow.png" alt="Жовта тривога — дрони" width="240">
+  <img src="https://raw.githubusercontent.com/denysosadchyi/alertss/main/docs/red.png" alt="Червона тривога — ракети" width="240">
+</p>
+<p align="center"><sub>Немає тривоги · Жовта — дрони (частина області) · Червона — ракети</sub></p>
 
 ## Завантажити
 
