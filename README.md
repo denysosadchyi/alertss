@@ -2,9 +2,13 @@
 
 Маленький віджет, який живе прямо на панелі задач (там, де зазвичай погода) і показує статус повітряної тривоги для вибраної області. Клік відкриває панель з картою України.
 
-![Віджет на панелі задач](docs/widget.png)
+| Немає тривоги | Жовта — дрони | Червона — ракети |
+|:---:|:---:|:---:|
+| <img src="docs/clear.png" width="260"> | <img src="docs/yellow.png" width="260"> | <img src="docs/red.png" width="260"> |
 
-![Панель з картою](docs/flyout.png)
+## Завантажити
+
+Готовий **[alertss.exe](https://github.com/denysosadchyi/alertss/releases/latest/download/alertss.exe)** (Windows 11 x64, без встановлення) — сторінка [Releases](https://github.com/denysosadchyi/alertss/releases/latest). Покладіть файл, наприклад, у `%LOCALAPPDATA%\alertss\` і запустіть; автозапуск вмикається в меню правого кліку. Windows SmartScreen може попередити, бо файл не підписаний: «Докладніше» → «Однаково запустити».
 
 ## Можливості
 
@@ -24,7 +28,7 @@
 
 Карта областей згенерована з Natural Earth (public domain) скриптом `tools/gen_map.py`.
 
-## Встановлення
+## Збірка з коду
 
 Потрібен Windows 11 і Rust (GNU або MSVC toolchain).
 
