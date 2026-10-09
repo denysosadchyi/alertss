@@ -1,0 +1,5 @@
+/target
+/.claude
+/.png
+__pycache__/
+*.pdb
