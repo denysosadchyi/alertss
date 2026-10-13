@@ -6,17 +6,17 @@ use windows::UI::Notifications::{ToastNotification, ToastNotificationManager};
 use windows::Win32::System::Registry::*;
 use windows::Win32::UI::Shell::SetCurrentProcessExplicitAppUserModelID;
 
-const DISPLAY_NAME: &str = "Тривоги";
+const DISPLAY_NAME: &str = "SirenBar";
 
-/// Register AUMID "Alertss.Widget" under HKCU\Software\Classes\AppUserModelId\Alertss.Widget
-/// (DisplayName = "Тривоги") and call SetCurrentProcessExplicitAppUserModelID. Errors ignored.
+/// Register AUMID "SirenBar.Widget" under HKCU\Software\Classes\AppUserModelId\SirenBar.Widget
+/// (DisplayName = "SirenBar") and call SetCurrentProcessExplicitAppUserModelID. Errors ignored.
 pub fn init() {
     unsafe {
         // Write DisplayName value
         let display_name_utf16: Vec<u16> = DISPLAY_NAME.encode_utf16().chain(std::iter::once(0)).collect();
         let _ = RegSetKeyValueW(
             HKEY_CURRENT_USER,
-            w!("Software\\Classes\\AppUserModelId\\Alertss.Widget"),
+            w!("Software\\Classes\\AppUserModelId\\SirenBar.Widget"),
             w!("DisplayName"),
             REG_SZ.0,
             Some(display_name_utf16.as_ptr() as *const _),
@@ -25,7 +25,7 @@ pub fn init() {
     }
 
     // Set the AUMID for the process
-    let _ = unsafe { SetCurrentProcessExplicitAppUserModelID(w!("Alertss.Widget")) };
+    let _ = unsafe { SetCurrentProcessExplicitAppUserModelID(w!("SirenBar.Widget")) };
 }
 
 /// Show a toast. `sound` = false -> silent. Must not panic; errors ignored.
@@ -51,7 +51,7 @@ pub fn show(title: &str, body: &str, sound: bool) {
         xml_doc.LoadXml(&HSTRING::from(&toast_xml))?;
 
         let toast = ToastNotification::CreateToastNotification(&xml_doc)?;
-        let notifier = ToastNotificationManager::CreateToastNotifierWithId(&HSTRING::from("Alertss.Widget"))?;
+        let notifier = ToastNotificationManager::CreateToastNotifierWithId(&HSTRING::from("SirenBar.Widget"))?;
         notifier.Show(&toast)?;
 
         Ok(())

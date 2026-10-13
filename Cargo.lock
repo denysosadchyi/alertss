@@ -3,17 +3,6 @@
 version = 4
 
 [[package]]
-name = "alertss"
-version = "0.1.1"
-dependencies = [
- "embed-manifest",
- "serde",
- "serde_json",
- "windows",
- "windows-numerics",
-]
-
-[[package]]
 name = "embed-manifest"
 version = "1.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -90,6 +79,17 @@ dependencies = [
  "serde",
  "serde_core",
  "zmij",
+]
+
+[[package]]
+name = "sirenbar"
+version = "0.2.0"
+dependencies = [
+ "embed-manifest",
+ "serde",
+ "serde_json",
+ "windows",
+ "windows-numerics",
 ]
 
 [[package]]

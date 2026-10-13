@@ -28,7 +28,7 @@ use crate::state::{short_region, with_app, Level, Status};
 use crate::icons::{self, Icon};
 use crate::{theme, util};
 
-const CLASS_NAME: PCWSTR = w!("AlertssTaskbarWidget");
+const CLASS_NAME: PCWSTR = w!("SirenBarTaskbarWidget");
 const TIMER_PULSE: usize = 1;
 const PULSE_MS: u32 = 40;
 /// Length of one pulse cycle in milliseconds.

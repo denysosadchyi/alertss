@@ -1,4 +1,4 @@
-//! Persistent settings in %APPDATA%\alertss\config.json.
+//! Persistent settings in %APPDATA%\SirenBar\config.json.
 
 use std::fs;
 use std::path::PathBuf;
@@ -53,7 +53,7 @@ impl Config {
 }
 
 impl Config {
-    /// Full path of the config file (%APPDATA%\alertss\config.json).
+    /// Full path of the config file (%APPDATA%\SirenBar\config.json).
     pub fn path() -> PathBuf {
         config_path().unwrap_or_else(|| PathBuf::from("config.json"))
     }
@@ -61,6 +61,18 @@ impl Config {
 
 fn config_path() -> Option<PathBuf> {
     std::env::var("APPDATA").ok().map(|appdata| {
-        PathBuf::from(appdata).join("alertss").join("config.json")
+        PathBuf::from(appdata).join("SirenBar").join("config.json")
     })
+}
+
+/// The app used to be called Alertss: carry its settings (region, token) over once.
+pub fn migrate_old() {
+    let (Some(new), Ok(appdata)) = (config_path(), std::env::var("APPDATA")) else { return };
+    let old = PathBuf::from(appdata).join("alertss").join("config.json");
+    if !new.exists() && old.exists() {
+        if let Some(dir) = new.parent() {
+            let _ = fs::create_dir_all(dir);
+        }
+        let _ = fs::copy(&old, &new);
+    }
 }

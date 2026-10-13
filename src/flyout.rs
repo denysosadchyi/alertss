@@ -155,7 +155,7 @@ fn open() {
 fn create_window() -> Option<HWND> {
     unsafe {
         let hinstance: HINSTANCE = GetModuleHandleW(None).ok()?.into();
-        let class = w!("AlertssFlyout");
+        let class = w!("SirenBarFlyout");
         let wc = WNDCLASSW {
             lpfnWndProc: Some(wndproc),
             hInstance: hinstance,
@@ -167,7 +167,7 @@ fn create_window() -> Option<HWND> {
         let h = CreateWindowExW(
             WS_EX_TOOLWINDOW | WS_EX_TOPMOST,
             class,
-            w!("Alertss"),
+            w!("SirenBar"),
             WS_POPUP | WS_THICKFRAME,
             0,
             0,

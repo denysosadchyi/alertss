@@ -37,7 +37,7 @@ fn main() {
 
     unsafe {
         // Single instance.
-        let _mutex = CreateMutexW(None, true, w!("Local\\AlertssTaskbarWidget"));
+        let _mutex = CreateMutexW(None, true, w!("Local\\SirenBarTaskbarWidget"));
         if GetLastError() == ERROR_ALREADY_EXISTS {
             return;
         }
@@ -45,11 +45,13 @@ fn main() {
         let _ = SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
         let _ = CoInitializeEx(None, COINIT_APARTMENTTHREADED);
 
+        config::migrate_old();
+        autostart::migrate_old();
         APP.with(|a| *a.borrow_mut() = Some(App::new(config::Config::load())));
         notify::init();
 
         let hinstance: HINSTANCE = GetModuleHandleW(None).unwrap().into();
-        let class = w!("AlertssMain");
+        let class = w!("SirenBarMain");
         let wc = WNDCLASSW {
             lpfnWndProc: Some(main_wndproc),
             hInstance: hinstance,
@@ -63,7 +65,7 @@ fn main() {
         let main = CreateWindowExW(
             WINDOW_EX_STYLE(WS_EX_TOOLWINDOW.0),
             class,
-            w!("Alertss"),
+            w!("SirenBar"),
             WS_POPUP,
             0,
             0,

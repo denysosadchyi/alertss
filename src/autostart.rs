@@ -1,4 +1,4 @@
-//! "Run at Windows startup" via HKCU\Software\Microsoft\Windows\CurrentVersion\Run, value "Alertss".
+//! "Run at Windows startup" via HKCU\Software\Microsoft\Windows\CurrentVersion\Run, value "SirenBar".
 
 use windows::core::w;
 use windows::Win32::System::Registry::*;
@@ -9,7 +9,7 @@ pub fn is_enabled() -> bool {
         RegGetValueW(
             HKEY_CURRENT_USER,
             w!("Software\\Microsoft\\Windows\\CurrentVersion\\Run"),
-            w!("Alertss"),
+            w!("SirenBar"),
             RRF_RT_REG_SZ,
             None,
             None,
@@ -31,7 +31,7 @@ pub fn set_enabled(on: bool) {
                     let _ = RegSetKeyValueW(
                         HKEY_CURRENT_USER,
                         w!("Software\\Microsoft\\Windows\\CurrentVersion\\Run"),
-                        w!("Alertss"),
+                        w!("SirenBar"),
                         REG_SZ.0,
                         Some(utf16.as_ptr() as *const _),
                         (utf16.len() * std::mem::size_of::<u16>()) as u32,
@@ -42,8 +42,35 @@ pub fn set_enabled(on: bool) {
             let _ = RegDeleteKeyValueW(
                 HKEY_CURRENT_USER,
                 w!("Software\\Microsoft\\Windows\\CurrentVersion\\Run"),
-                w!("Alertss"),
+                w!("SirenBar"),
             );
         }
+    }
+}
+
+/// The app used to be called Alertss: drop its autostart value and its notification id,
+/// and keep autostart on under the new name if the old one had it.
+pub fn migrate_old() {
+    unsafe {
+        let mut size = 0u32;
+        let had = RegGetValueW(
+            HKEY_CURRENT_USER,
+            w!("Software\\Microsoft\\Windows\\CurrentVersion\\Run"),
+            w!("Alertss"),
+            RRF_RT_REG_SZ,
+            None,
+            None,
+            Some(&mut size),
+        )
+        .is_ok();
+        if had {
+            let _ = RegDeleteKeyValueW(
+                HKEY_CURRENT_USER,
+                w!("Software\\Microsoft\\Windows\\CurrentVersion\\Run"),
+                w!("Alertss"),
+            );
+            set_enabled(true);
+        }
+        let _ = RegDeleteTreeW(HKEY_CURRENT_USER, w!("Software\\Classes\\AppUserModelId\\Alertss.Widget"));
     }
 }

@@ -1,21 +1,21 @@
-# Alertss — повітряні тривоги на панелі задач Windows 11
+# SirenBar — повітряні тривоги на панелі задач Windows 11
 
 Маленький віджет, який живе прямо на панелі задач (там, де зазвичай погода) і показує статус повітряної тривоги для вибраної області. Клік відкриває панель з картою України.
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/denysosadchyi/alertss/main/docs/clear.png" alt="Немає тривоги" width="240">
-  <img src="https://raw.githubusercontent.com/denysosadchyi/alertss/main/docs/yellow.png" alt="Жовта тривога — дрони" width="240">
-  <img src="https://raw.githubusercontent.com/denysosadchyi/alertss/main/docs/red.png" alt="Червона тривога — ракети" width="240">
+  <img src="https://raw.githubusercontent.com/denysosadchyi/sirenbar/main/docs/clear.png" alt="Немає тривоги" width="240">
+  <img src="https://raw.githubusercontent.com/denysosadchyi/sirenbar/main/docs/yellow.png" alt="Жовта тривога — дрони" width="240">
+  <img src="https://raw.githubusercontent.com/denysosadchyi/sirenbar/main/docs/red.png" alt="Червона тривога — ракети" width="240">
 </p>
 <p align="center"><sub>Немає тривоги · Жовта — дрони (частина області) · Червона — ракети</sub></p>
 
 ## Завантажити
 
-**[alertss-setup.exe](https://github.com/denysosadchyi/alertss/releases/latest/download/alertss-setup.exe)** — інсталятор (Windows 11 x64). Права адміністратора не потрібні: програма ставиться у `%LOCALAPPDATA%\alertss\`, за бажанням додає автозапуск і ярлик у «Пуск», видаляється через *Параметри → Програми*.
+**[sirenbar-setup.exe](https://github.com/denysosadchyi/sirenbar/releases/latest/download/sirenbar-setup.exe)** — інсталятор (Windows 11 x64). Права адміністратора не потрібні: програма ставиться у `%LOCALAPPDATA%\SirenBar\`, за бажанням додає автозапуск і ярлик у «Пуск», видаляється через *Параметри → Програми*.
 
-Без інсталятора — окремий **[alertss.exe](https://github.com/denysosadchyi/alertss/releases/latest/download/alertss.exe)**: покладіть у будь-яку папку й запустіть; автозапуск вмикається в меню правого кліку.
+Без інсталятора — окремий **[sirenbar.exe](https://github.com/denysosadchyi/sirenbar/releases/latest/download/sirenbar.exe)**: покладіть у будь-яку папку й запустіть; автозапуск вмикається в меню правого кліку.
 
-Файли не підписані, тож Windows SmartScreen може попередити: «Докладніше» → «Однаково запустити». Усі версії — на сторінці [Releases](https://github.com/denysosadchyi/alertss/releases).
+Файли не підписані, тож Windows SmartScreen може попередити: «Докладніше» → «Однаково запустити». Усі версії — на сторінці [Releases](https://github.com/denysosadchyi/sirenbar/releases).
 
 ## Можливості
 
@@ -43,7 +43,7 @@
 cargo build --release
 ```
 
-Готовий файл — `target/release/alertss.exe`. Скопіюйте його куди зручно (наприклад, `%LOCALAPPDATA%\alertss\`) і запустіть. Вбудований віджет погоди краще вимкнути: *Параметри → Персоналізація → Панель завдань → Віджети*.
+Готовий файл — `target/release/sirenbar.exe`. Скопіюйте його куди зручно (наприклад, `%LOCALAPPDATA%\SirenBar\`) і запустіть. Вбудований віджет погоди краще вимкнути: *Параметри → Персоналізація → Панель завдань → Віджети*.
 
 ## Керування
 
@@ -51,7 +51,7 @@ cargo build --release
 - **Клік по області на карті** — стежити за нею.
 - **Правий клік** — меню: область, звук, анімація, автозапуск, токен, карта тривог, вихід.
 
-Налаштування зберігаються в `%APPDATA%\alertss\config.json`.
+Налаштування зберігаються в `%APPDATA%\SirenBar\config.json`.
 
 ## Розробка
 
@@ -63,7 +63,7 @@ cargo run --release -- --fake-alert   # демо: стани змінюютьс�
 Інсталятор збирається [Inno Setup](https://jrsoftware.org/isinfo.php) 6 після `cargo build --release`:
 
 ```sh
-ISCC installer/alertss.iss       # -> target/installer/alertss-setup.exe
+ISCC installer/sirenbar.iss       # -> target/installer/sirenbar-setup.exe
 ```
 
 Іконки — [Fluent UI System Icons](https://github.com/microsoft/fluentui-system-icons) (MIT), іконки дрона й ракети намальовані власноруч (див. `assets/icons/README.txt`).
