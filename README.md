@@ -11,7 +11,11 @@
 
 ## Завантажити
 
-Готовий **[alertss.exe](https://github.com/denysosadchyi/alertss/releases/latest/download/alertss.exe)** (Windows 11 x64, без встановлення) — сторінка [Releases](https://github.com/denysosadchyi/alertss/releases/latest). Покладіть файл, наприклад, у `%LOCALAPPDATA%\alertss\` і запустіть; автозапуск вмикається в меню правого кліку. Windows SmartScreen може попередити, бо файл не підписаний: «Докладніше» → «Однаково запустити».
+**[alertss-setup.exe](https://github.com/denysosadchyi/alertss/releases/latest/download/alertss-setup.exe)** — інсталятор (Windows 11 x64). Права адміністратора не потрібні: програма ставиться у `%LOCALAPPDATA%\alertss\`, за бажанням додає автозапуск і ярлик у «Пуск», видаляється через *Параметри → Програми*.
+
+Без інсталятора — окремий **[alertss.exe](https://github.com/denysosadchyi/alertss/releases/latest/download/alertss.exe)**: покладіть у будь-яку папку й запустіть; автозапуск вмикається в меню правого кліку.
+
+Файли не підписані, тож Windows SmartScreen може попередити: «Докладніше» → «Однаково запустити». Усі версії — на сторінці [Releases](https://github.com/denysosadchyi/alertss/releases).
 
 ## Можливості
 
@@ -54,6 +58,12 @@ cargo build --release
 ```sh
 cargo test                       # тести парсерів, іконок, геометрії карти
 cargo run --release -- --fake-alert   # демо: стани змінюються кожні 20 с
+```
+
+Інсталятор збирається [Inno Setup](https://jrsoftware.org/isinfo.php) 6 після `cargo build --release`:
+
+```sh
+ISCC installer/alertss.iss       # -> target/installer/alertss-setup.exe
 ```
 
 Іконки — [Fluent UI System Icons](https://github.com/microsoft/fluentui-system-icons) (MIT), іконки дрона й ракети намальовані власноруч (див. `assets/icons/README.txt`).
