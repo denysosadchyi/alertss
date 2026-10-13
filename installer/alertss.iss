@@ -14,6 +14,7 @@ AppPublisher=Denys Osadchyi
 AppPublisherURL=https://github.com/denysosadchyi/alertss
 AppSupportURL=https://github.com/denysosadchyi/alertss/issues
 DefaultDirName={localappdata}\alertss
+DisableWelcomePage=no
 DisableDirPage=yes
 DisableProgramGroupPage=yes
 PrivilegesRequired=lowest
@@ -21,32 +22,50 @@ OutputDir=..\target\installer
 OutputBaseFilename=alertss-setup
 Compression=lzma2
 SolidCompression=yes
-WizardStyle=modern
+WizardStyle=modern dynamic
+WizardImageFile=img\wiz_100.png,img\wiz_125.png,img\wiz_150.png,img\wiz_200.png,img\wiz_250.png
+WizardSmallImageFile=img\small_100.png,img\small_125.png,img\small_150.png,img\small_200.png,img\small_250.png
+WizardImageStretch=no
+SetupIconFile=..\assets\alertss.ico
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 MinVersion=10.0.22000
-UninstallDisplayIcon={app}\{#AppExe}
+UninstallDisplayIcon={app}\alertss.ico
 UninstallDisplayName={#AppName} — повітряні тривоги
 
 [Languages]
 Name: "uk"; MessagesFile: "compiler:Languages\Ukrainian.isl"
 
+[Messages]
+WelcomeLabel1=Alertss — повітряні тривоги на панелі задач
+WelcomeLabel2=Невеликий віджет зліва на панелі задач показуватиме статус повітряної тривоги у вашій області:%n%n•  жовта — атака дронів%n•  червона — ракетна небезпека%n•  відбій — можна видихнути%n%nКлік по віджету відкриває карту України з усіма тривогами, райони під загрозою і журнал за день. Про початок і відбій тривоги прийде сповіщення Windows.%n%nПрава адміністратора не потрібні.
+WizardSelectTasks=Налаштування
+SelectTasksDesc=Як має працювати віджет?
+SelectTasksLabel2=Виберіть потрібне й натисніть «Далі».
+ReadyLabel1=Усе готово до встановлення Alertss.
+ReadyLabel2a=Натисніть «Встановити». Це займе кілька секунд.
+FinishedHeadingLabel=Alertss встановлено
+FinishedLabelNoIcons=Віджет з'явиться зліва на панелі задач. Свою область виберіть кліком по карті у віджеті або через меню правого кліку.%n%nБережіть себе і не ігноруйте тривоги.
+FinishedLabel=Віджет з'явиться зліва на панелі задач. Свою область виберіть кліком по карті у віджеті або через меню правого кліку.%n%nБережіть себе і не ігноруйте тривоги.
+ConfirmUninstall=Видалити Alertss? Віджет зникне з панелі задач і більше не попереджатиме про тривоги.
+
 [Tasks]
-Name: "autostart"; Description: "Запускати разом з Windows"
-Name: "startmenu"; Description: "Ярлик у меню «Пуск»"
+Name: "autostart"; Description: "Запускати разом з Windows (рекомендовано — віджет завжди буде на панелі задач)"
+Name: "startmenu"; Description: "Додати ярлик у меню «Пуск»"
 
 [Files]
 Source: "..\target\release\{#AppExe}"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\assets\alertss.ico"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
-Name: "{userprograms}\{#AppName}"; Filename: "{app}\{#AppExe}"; Tasks: startmenu
+Name: "{userprograms}\{#AppName}"; Filename: "{app}\{#AppExe}"; IconFilename: "{app}\alertss.ico"; Comment: "Повітряні тривоги на панелі задач"; Tasks: startmenu
 
 [Registry]
 ; Same value the app itself writes from its "Запускати з Windows" menu item.
 Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; ValueName: "Alertss"; ValueData: """{app}\{#AppExe}"""; Tasks: autostart; Flags: uninsdeletevalue
 
 [Run]
-Filename: "{app}\{#AppExe}"; Description: "Запустити {#AppName}"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\{#AppExe}"; Description: "Запустити Alertss зараз"; Flags: nowait postinstall skipifsilent
 
 [UninstallRun]
 Filename: "{sys}\taskkill.exe"; Parameters: "/F /IM {#AppExe}"; Flags: runhidden; RunOnceId: "KillApp"
