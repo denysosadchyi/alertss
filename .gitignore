@@ -3,3 +3,4 @@
 /.png
 __pycache__/
 *.pdb
+/store/*.msix
