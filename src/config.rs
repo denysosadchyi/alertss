@@ -60,19 +60,29 @@ impl Config {
 }
 
 fn config_path() -> Option<PathBuf> {
+    if crate::package::is_packaged() {
+        return crate::package::local_state().map(|d| d.join("config.json"));
+    }
     std::env::var("APPDATA").ok().map(|appdata| {
         PathBuf::from(appdata).join("SirenBar").join("config.json")
     })
 }
 
-/// The app used to be called Alertss: carry its settings (region, token) over once.
+/// Carry settings (region, token) over once: from the old "Alertss" name, and into the
+/// Store package from a previously installed plain exe.
 pub fn migrate_old() {
     let (Some(new), Ok(appdata)) = (config_path(), std::env::var("APPDATA")) else { return };
-    let old = PathBuf::from(appdata).join("alertss").join("config.json");
-    if !new.exists() && old.exists() {
-        if let Some(dir) = new.parent() {
-            let _ = fs::create_dir_all(dir);
+    if new.exists() {
+        return;
+    }
+    let appdata = PathBuf::from(appdata);
+    for old in [appdata.join("SirenBar").join("config.json"), appdata.join("alertss").join("config.json")] {
+        if old != new && old.exists() {
+            if let Some(dir) = new.parent() {
+                let _ = fs::create_dir_all(dir);
+            }
+            let _ = fs::copy(&old, &new);
+            return;
         }
-        let _ = fs::copy(&old, &new);
     }
 }

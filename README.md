@@ -66,4 +66,12 @@ cargo run --release -- --fake-alert   # демо: стани змінюютьс�
 ISCC installer/sirenbar.iss       # -> target/installer/sirenbar-setup.exe
 ```
 
+MSIX-пакет для Microsoft Store (потрібні `makeappx`/`makepri` з NuGet-пакета Microsoft.Windows.SDK.BuildTools, шлях — у `SDKBIN`):
+
+```sh
+powershell -File msix/build.ps1  # -> target/msix/SirenBar_<версія>_x64.msix
+```
+
+[Політика конфіденційності](PRIVACY.md).
+
 Іконки — [Fluent UI System Icons](https://github.com/microsoft/fluentui-system-icons) (MIT), іконки дрона й ракети намальовані власноруч (див. `assets/icons/README.txt`).

@@ -1,9 +1,21 @@
-//! "Run at Windows startup" via HKCU\Software\Microsoft\Windows\CurrentVersion\Run, value "SirenBar".
+//! "Run at Windows startup": HKCU\Software\Microsoft\Windows\CurrentVersion\Run, value "SirenBar",
+//! or the package's StartupTask when installed from the Store (the Run key is virtualized there).
 
-use windows::core::w;
+use crate::package;
+use windows::core::{w, HSTRING};
+use windows::ApplicationModel::{StartupTask, StartupTaskState};
 use windows::Win32::System::Registry::*;
 
+fn startup_task() -> Option<StartupTask> {
+    StartupTask::GetAsync(&HSTRING::from(package::STARTUP_TASK)).ok()?.join().ok()
+}
+
 pub fn is_enabled() -> bool {
+    if package::is_packaged() {
+        return startup_task()
+            .and_then(|t| t.State().ok())
+            .is_some_and(|s| s == StartupTaskState::Enabled || s == StartupTaskState::EnabledByPolicy);
+    }
     let mut size = 0u32;
     unsafe {
         RegGetValueW(
@@ -21,6 +33,18 @@ pub fn is_enabled() -> bool {
 
 /// Enable writes "\"<current exe path>\""; disable deletes the value. Errors ignored.
 pub fn set_enabled(on: bool) {
+    if package::is_packaged() {
+        // If the user turned it off in Task Manager / Settings, Windows keeps it off
+        // (DisabledByUser) and RequestEnableAsync just reports that.
+        if let Some(t) = startup_task() {
+            if on {
+                let _ = t.RequestEnableAsync().and_then(|op| op.join());
+            } else {
+                let _ = t.Disable();
+            }
+        }
+        return;
+    }
     unsafe {
         if on {
             if let Ok(path) = std::env::current_exe() {
@@ -51,6 +75,9 @@ pub fn set_enabled(on: bool) {
 /// The app used to be called Alertss: drop its autostart value and its notification id,
 /// and keep autostart on under the new name if the old one had it.
 pub fn migrate_old() {
+    if package::is_packaged() {
+        return;
+    }
     unsafe {
         let mut size = 0u32;
         let had = RegGetValueW(

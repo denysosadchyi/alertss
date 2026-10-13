@@ -11,6 +11,9 @@ const DISPLAY_NAME: &str = "SirenBar";
 /// Register AUMID "SirenBar.Widget" under HKCU\Software\Classes\AppUserModelId\SirenBar.Widget
 /// (DisplayName = "SirenBar") and call SetCurrentProcessExplicitAppUserModelID. Errors ignored.
 pub fn init() {
+    if crate::package::is_packaged() {
+        return; // the package already has its own identity and display name
+    }
     unsafe {
         // Write DisplayName value
         let display_name_utf16: Vec<u16> = DISPLAY_NAME.encode_utf16().chain(std::iter::once(0)).collect();
@@ -51,7 +54,11 @@ pub fn show(title: &str, body: &str, sound: bool) {
         xml_doc.LoadXml(&HSTRING::from(&toast_xml))?;
 
         let toast = ToastNotification::CreateToastNotification(&xml_doc)?;
-        let notifier = ToastNotificationManager::CreateToastNotifierWithId(&HSTRING::from("SirenBar.Widget"))?;
+        let notifier = if crate::package::is_packaged() {
+            ToastNotificationManager::CreateToastNotifier()?
+        } else {
+            ToastNotificationManager::CreateToastNotifierWithId(&HSTRING::from("SirenBar.Widget"))?
+        };
         notifier.Show(&toast)?;
 
         Ok(())

@@ -8,6 +8,7 @@ mod icons;
 mod map_data;
 mod menu;
 mod notify;
+mod package;
 mod state;
 mod theme;
 mod util;
