@@ -238,6 +238,31 @@ fn normalize_key(name: &str) -> &str {
     }
 }
 
+/// Number of raions per oblast (since the 2020 reform).
+fn raion_count(key: &str) -> usize {
+    match key {
+        "Тернопільська область" | "Хмельницька область" | "Чернівецька область" => 3,
+        "Волинська область" | "Житомирська область" | "Кіровоградська область" | "Миколаївська область"
+        | "Полтавська область" | "Рівненська область" | "Черкаська область" => 4,
+        "Запорізька область" | "Сумська область" | "Херсонська область" | "Чернігівська область" => 5,
+        "Вінницька область" | "Закарпатська область" | "Івано-Франківська область" => 6,
+        "Дніпропетровська область" | "Київська область" | "Львівська область" | "Одеська область"
+        | "Харківська область" => 7,
+        "Донецька область" | "Луганська область" => 8,
+        _ => 0,
+    }
+}
+
+/// True when the alert areas include every raion of the oblast, i.e. the whole oblast is
+/// under alert even though the source listed it raion by raion (Donetsk usually does).
+fn all_raions(key: &str, areas: &[String]) -> bool {
+    let n = raion_count(key);
+    let mut raions: Vec<&String> = areas.iter().filter(|a| a.ends_with(" район") || a.ends_with(" р-н")).collect();
+    raions.sort();
+    raions.dedup();
+    n > 0 && raions.len() >= n
+}
+
 /// Parse the response of `GET /v1/alerts/active.json` into a full 26-region snapshot.
 pub fn parse_official(json: &str, now: i64) -> Result<Snapshot, String> {
     let v: serde_json::Value = serde_json::from_str(json).map_err(|e| format!("JSON: {e}"))?;
@@ -289,11 +314,13 @@ pub fn parse_official(json: &str, now: i64) -> Result<Snapshot, String> {
 
     for (key, st) in regions.iter_mut() {
         if st.alert && !whole.contains_key(key) {
-            st.partial = true;
             let mut list = areas.remove(key).unwrap_or_default();
             list.sort();
             list.dedup();
-            st.areas = list;
+            if !all_raions(key, &list) {
+                st.partial = true;
+                st.areas = list;
+            }
         }
     }
 
@@ -529,6 +556,7 @@ fn apply_paragraph(para: &str, clock: &KyivClock, now: i64, regions: &mut BTreeM
         (Level::Red, Vec::new(), true)
     };
 
+    let whole = whole || all_raions(key, &areas);
     st.alert = true;
     st.level = level;
     st.partial = !whole;
@@ -765,6 +793,44 @@ mod tests {
         let vo = &s.regions["Волинська область"];
         assert!(vo.alert && !vo.partial && vo.level == Level::Yellow);
         assert!(!s.regions["Вінницька область"].alert);
+    }
+
+    /// Every raion listed separately (Donetsk style) means the whole oblast, not "partial".
+    #[test]
+    fn all_raions_listed_is_whole() {
+        let raion = |t: &str, o: &str| format!(
+            r#"{{"location_title":"{t}","location_type":"raion","started_at":"2026-10-09T10:00:00Z","finished_at":null,"alert_type":"air_raid","location_oblast":"{o}","alert_level":"red"}}"#
+        );
+        let dn = ["Бахмутський", "Волноваський", "Горлівський", "Донецький", "Кальміуський", "Краматорський", "Маріупольський", "Покровський"];
+        let mut items: Vec<String> = dn.iter().map(|r| raion(&format!("{r} район"), "Донецька область")).collect();
+        // Kharkiv: six of seven raions plus a hromada and a city -> still partial.
+        for r in ["Ізюмський", "Богодухівський", "Куп'янський", "Лозівський", "Харківський", "Чугуївський"] {
+            items.push(raion(&format!("{r} район"), "Харківська область"));
+        }
+        items.push(raion("Харківська територіальна громада", "Харківська область"));
+        items.push(raion("м. Харків", "Харківська область"));
+        let json = format!(r#"{{"alerts":[{}]}}"#, items.join(","));
+        let s = parse_official(&json, 1).unwrap();
+        let d = &s.regions["Донецька область"];
+        assert!(d.alert && !d.partial && d.areas.is_empty());
+        let k = &s.regions["Харківська область"];
+        assert!(k.alert && k.partial && k.areas.len() == 8);
+
+        // Same rule for the SITREP: Donetsk with all 8 raions listed.
+        let md = "LOCAL TIME     Friday, 09 October 2026, 11:20 (Europe/Kyiv, 2026-10-09T11:20:59+03:00)
+
+## 3. CURRENT WARNING STATUS
+
+**Donetska oblast (Донецька область)** — air raid alert in effect since 01:45, ongoing for 13 h 3 min. 8 areas affected: Bakhmutskyi (Бахмутський), Volnovaskyi (Волноваський), Kalmiuskyi (Кальміуський), Mariupolskyi (Маріупольський), Horlivskyi (Горлівський), Donetskyi (Донецький), Kramatorskyi (Краматорський), Pokrovskyi (Покровський) [red (missile / mass-strike level)].
+
+**Poltavska oblast (Полтавська область)** — air raid alert in effect since 10:01. 3 areas affected: Kremenchutskyi (Кременчуцький), Poltavskyi (Полтавський), Lubenskyi (Лубенський) [yellow (drone level)].
+
+## 4. THREAT ACTIVITY
+";
+        let s = parse_sitrep(md, real_now()).unwrap();
+        let d = &s.regions["Донецька область"];
+        assert!(d.alert && !d.partial && d.level == Level::Red);
+        assert!(s.regions["Полтавська область"].partial);
     }
 
     #[test]
